@@ -17,6 +17,12 @@ import sys
 
 context = SimpleOpenNI(this)
 
+def saveframe(data):
+    filename = str(int(time.time()))+".xyz"
+    with open(filename, "w") as text_file:
+        for line in data:
+            text_file.write(line)
+
 def setup():
     size(640*2, 480)
 
@@ -46,10 +52,11 @@ def draw():
     # draw irImageMap
     image(context.rgbImage(), context.depthWidth() + 10, 0)
 
+    
 
     #for i in dir(context): print(i)
 
-    print("deviceCount {} deviceIndex {} depthImageColorMode".format(context.deviceCount(), context.deviceIndex(), context.depthImageColorMode()))
-    print("Field of View {} {}".format(context.vFieldOfView(), context.hFieldOfView()))
-    print("depth {} {} irTimeStamp {}".format(context.depthWidth(), context.depthWidth(), context.irTimeStamp()))
-    print("rgb {} {} sceneTimeStamp {}".format(context.rgbWidth(), context.rgbHeight(), context.sceneTimeStamp()))
+    # print("deviceCount {} deviceIndex {} depthImageColorMode".format(context.deviceCount(), context.deviceIndex(), context.depthImageColorMode()))
+    # print("Field of View {} {}".format(context.vFieldOfView(), context.hFieldOfView()))
+    # print("depth {} {} irTimeStamp {}".format(context.depthWidth(), context.depthWidth(), context.irTimeStamp()))
+    # print("rgb {} {} sceneTimeStamp {}".format(context.rgbWidth(), context.rgbHeight(), context.sceneTimeStamp()))

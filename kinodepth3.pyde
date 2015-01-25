@@ -1,21 +1,24 @@
 """
 /* --------------------------------------------------------------------------
- * SimpleOpenNI AlternativeViewpoint3d Test
+ * KinoDepth: SimpleOpenNI based Recording Software
  * --------------------------------------------------------------------------
  * Processing Wrapper for the OpenNI/Kinect 2 library
  * http:#code.google.com/p/simple-openni
  * --------------------------------------------------------------------------
- * prog:  Max Rheiner / Interaction Design / Zhdk / http:#iad.zhdk.ch/
- * date:  12/12/2012 (m/d/y)
+ * prog:  Carlos Padial / Interaction Design / Kinoraw / http:kinoraw.net/
+ * date:  24/01/2015 (m/d/y)
  * ----------------------------------------------------------------------------
  */
  """
 
 from SimpleOpenNI import SimpleOpenNI
 
+
 import sys, time, os
 
-context = SimpleOpenNI(this)
+#context = SimpleOpenNI(this)
+
+context = SimpleOpenNI(0,this,SimpleOpenNI.RUN_MODE_MULTI_THREADED)
 # disable mirror
 context.setMirror(False)
 
@@ -35,6 +38,10 @@ framenumber = 0
 capture = False
 record = False
 folder = ""
+footage_folder = "/home/carlos/Escritorio/depth-footage"
+
+t1 = str(time.localtime()[5]).zfill(6)
+t2 = str(time.time()).rpartition(".")[0]
 
 recording = []
 
@@ -85,7 +92,7 @@ def read_frame():
                 points.append(str(round(point.x, 3)) + " " + str(round(point.y, 3)) + " " + str(round(point.z, 3)) + " " + color)
     data.append(header.format(len(points)))
     for i in points:
-    	data.append(i)
+        data.append(i)
     return data
             
 def write_frame(data, filename):
@@ -93,10 +100,14 @@ def write_frame(data, filename):
         for line in data:
             text_file.write(line + "\n")
 
+def mkdir(path):
+    a = os.system("mkdir {}".format(dir))
+    print(a)
+
 
 def draw():
-    global rgbImage, depthImage, depthMap, capture, framenumber, recording
-
+    global rgbImage, depthImage, depthMap, capture, framenumber 
+    global recording, t1, t2, steps, folder
     # update the cam
     context.update()
 
@@ -109,27 +120,57 @@ def draw():
     # draw depthImageMap
     image(depthImage, 0, 0)
 
+    # update timers
+    t1 = str(time.localtime()[5]).zfill(6)
+    t2 = str(time.time()).rpartition(".")[0]
+
     if capture:
-        filename = str(int(time.time()))+".ply"
+        filename = os.path.join(footage_folder,t2 +".ply")
+        #filename = str(int(time.time()))+".ply"
         data = read_frame()
         write_frame(data, filename)
-        capture = False
 
-    if record:
-    	data = read_frame()
-        recording.append((framenumber, data, time.time()))
-        if len(recording) > 10:
-        	for frame in recording:
-        		filename = os.path.join("./" + folder, str(frame[0])+".ply")
-        		write_frame(frame[1], filename)
-        		print(filename)
-        	recording = []
+    if record == True:
+        data = read_frame()
+        recording.append((t1, t2, data, folder))
         framenumber +=1 
-        
+    else:
+        if len(recording) != 0:
+            for frame in recording:
+                folder = frame[3]
+                filepath = os.path.join(footage_folder, folder)
+                print(filepath)
+                filename = os.path.join(filepath, frame[0] + "_" + frame[1] + ".ply")
+                write_frame(frame[2], filename)
+                print(filename)
+            recording = []
+            folder = ""
+    drawgui()
+    capture = False
+           
+def drawgui():
     
+    fill(255,0,0)
+    stroke(255,0,0)
+
+    label1 = "frame:{}  {}:{}      {}".format(framenumber, t1, t2, steps)
+    textSize(15)
+    text(label1, 50, 50) 
+
+    stroke(255,0,0,75)
+    strokeWeight(4)
+    if record == True or capture == True:
+        fill(255,0,0,75)
+    else:
+        fill(0,0,0,75)
+    ellipse(width - 50, 50, 70, 70)
+
+
+
+
 
 def keyPressed():
-    global capture, record, folder, framenumber
+    global capture, record, folder, framenumber, steps
     
     if keyPressed:
         # (C)apture frame
@@ -146,28 +187,24 @@ def keyPressed():
                 framenumber = 0
         # start (R)ecording
         if key == "r":
-            folder = str(int(time.time()))
-
-            os.system("mkdir " + folder)
-            os.system("cd " + folder)
             record = True
+            folder = str(time.time()).rpartition(".")[0] + "_" + str(steps)
+            path = os.path.join(footage_folder, folder)
+            os.system("mkdir {}".format(path))
+            print("folder {} created!!".format(path))
 
 
 
+    if key == CODED:
+        #if keyCode == RIGHT:
 
-    # if key == CODED:
-    #     if keyCode == RIGHT:
+        #if keyCode == LEFT:
 
-    #     if keyCode == LEFT:
-
-    #     if keyCode == UP:
-
-    #     if keyCode == DOWN:
-
-        
-    
-
-
-
-
-
+        if keyCode == UP:
+            steps += 1
+            if steps > 100:
+                steps > 100
+        if keyCode == DOWN:
+            steps -= 1
+            if steps == 0:
+                steps = 1
