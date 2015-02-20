@@ -1,22 +1,20 @@
 """
 /* --------------------------------------------------------------------------
- * SimpleOpenNI Record/Play Test
+ * SimpleOpenNI Capture oni app for kinect 
  * --------------------------------------------------------------------------
  * Processing Wrapper for the OpenNI/Kinect 2 library
  * http:#code.google.com/p/simple-openni
  * --------------------------------------------------------------------------
- * prog:  Max Rheiner / Interaction Design / Zhdk / http:#iad.zhdk.ch/
- * date:  12/12/2012 (m/d/y)
+ * prog:  carlos padial
+ * date:  10/02/2015 (m/d/y)
  * ----------------------------------------------------------------------------
- * For playing the recorded file, just set recordFlag to False
- * All files should be in the data subfolder of the current project, abs.
- * path work as well
+ * 
  * ----------------------------------------------------------------------------
  */
 """
 import time, math
 
-recordPath = "./" + str(time.time()).rpartition(".")[0] + ".oni"
+recordPath = "/media/carlos/western_data/kinect/depth-footage/" + str(time.time()).rpartition(".")[0] + ".oni"
 
 from SimpleOpenNI import SimpleOpenNI
 
